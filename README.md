@@ -1,3 +1,3 @@
-# Go-Asseter
+# Asseter
 
-a Asseter for a go api Project with gin and gorm
+WIP - Asset Manager for everything you need 
