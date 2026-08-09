@@ -1,0 +1,17 @@
+services:
+  app:
+    image: ghcr.io/jesperrichert/asseter:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      POSTGRES_URL: "jdbc:postgresql://root:password@localhost:5432/asseter"
+  postgres:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: "password"
+      POSTGRES_USER: "root"
+      POSTGRES_DB: "asseter"
+      

@@ -1,8 +1,9 @@
 package config
 
 import (
-	"github.com/gin-gonic/gin"
 	"os"
+
+	"github.com/gin-gonic/gin"
 )
 
 func NewWeb(engine *gin.Engine) {
