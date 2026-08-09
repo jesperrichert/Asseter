@@ -16,7 +16,7 @@ type Appconfig struct {
 func Build(config *Appconfig) {
 
 	//Register Services
-	authService := services.NewAuthService()
+	authService := services.NewAuthService(config.DB)
 	storageService := services.NewStorageService()
 
 	//Register Controller

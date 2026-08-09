@@ -25,7 +25,8 @@ func (c *RouterConfig) Setup() {
 	auth := c.App.Group("/auth")
 	{
 		auth.GET("/", c.AuthController.Get)
-		auth.GET("/oidc", c.AuthController.Oidc)
+		auth.GET("/oidc/callback", c.AuthController.Oidc)
+		auth.GET("/oidc", c.AuthController.OidcConfig)
 		auth.POST("/", c.AuthController.Post)
 	}
 

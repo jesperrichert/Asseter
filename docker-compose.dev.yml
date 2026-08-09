@@ -1,11 +1,15 @@
 services:
   app:
     image: ghcr.io/jesperrichert/asseter:latest
+    ports:
+      - "4000:3000"
+    depends_on:
+      - postgres
     build:
       context: .
       dockerfile: Dockerfile
-    environment:
-      POSTGRES_URL: "jdbc:postgresql://root:password@localhost:5432/asseter"
+    env_file:
+      - .env
   postgres:
     image: postgres:latest
     ports:

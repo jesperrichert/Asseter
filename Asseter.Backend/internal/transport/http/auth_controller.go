@@ -1,6 +1,8 @@
 package http
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"go.Asseter/internal/services"
 	"gorm.io/gorm"
@@ -30,5 +32,12 @@ func (e *AuthController) Get(ctx *gin.Context) {
 
 // GET
 func (e *AuthController) Oidc(ctx *gin.Context) {
+	e.service.Oidc(ctx, ctx.Query("code"))
+}
 
+// GET
+func (e *AuthController) OidcConfig(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, gin.H{
+		"authenticationUrl": e.service.GenerateOidcAuthorizationUrl(),
+	})
 }

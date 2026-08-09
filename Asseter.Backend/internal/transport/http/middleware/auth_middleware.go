@@ -36,6 +36,7 @@ func (middleware *AuthMiddleware) Handle(ctx *gin.Context) {
 
 	if len(access.Token) != 0 {
 		ctx.Next()
+		return
 	}
 
 	util.GenerateResponse(

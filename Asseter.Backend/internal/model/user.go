@@ -7,6 +7,5 @@ type User struct {
 	UserName    string
 	AccessToken string
 	IsOidc      bool
-	APIAccessId int
 	APIAccess   *APIAccess
 }

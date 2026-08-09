@@ -4,15 +4,15 @@ WORKDIR /app
 FROM node:latest AS frontend
 WORKDIR /Asseter.Frontend
 
-COPY Asseter.Frontend/ .
+COPY /Asseter.Frontend /Asseter.Frontend
 
-RUN npn install
+RUN npm install
 RUN npm run build
 
 FROM base AS backend
 WORKDIR /Asseter.Backend
 
-COPY Asseter.Backend/ .
+COPY /Asseter.Backend /Asseter.Backend
 
 RUN go build cmd/main.go 
 
