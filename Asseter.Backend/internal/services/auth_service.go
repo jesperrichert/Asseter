@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"go.Asseter/internal/dto"
 	"go.Asseter/internal/model"
 	"go.Asseter/internal/util"
@@ -54,6 +55,7 @@ func (e *AuthService) Oidc(ctx *gin.Context, code string) {
 
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
 	defer res.Body.Close()
 
@@ -66,6 +68,7 @@ func (e *AuthService) Oidc(ctx *gin.Context, code string) {
 	userCheck, err := client.Do(r)
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
 	defer userCheck.Body.Close()
 
@@ -73,17 +76,44 @@ func (e *AuthService) Oidc(ctx *gin.Context, code string) {
 	json.NewDecoder(userCheck.Body).Decode(&userInfo)
 
 	var user model.User
+	tokenUUID := uuid.New()
 	e.DB.Where("user_name = ?", userInfo.PreferredUsername).First(&user)
-	if len(user.UserName) == 0 {
-		// TODO: Add user to database
-		// Generate User Auth Key
-	} else {
-		util.GenerateResponse(
+	if len(user.UserName) == 0 && len(userInfo.PreferredUsername) != 0 {
+		user.AccessToken = tokenData.AccessToken
+		user.IsOidc = true
+		user.UserName = userInfo.PreferredUsername
+
+		e.DB.Create(&user)
+		e.DB.Create(&model.APIAccess{
+			User:        &user,
+			Permissions: []string{"oidc"},
+			Token:       tokenUUID.String(),
+		})
+
+		util.GenerateAuthRedirect(
 			ctx,
-			http.StatusConflict,
-			"User already exists",
-			true,
-			nil,
+			tokenUUID.String(),
+			false,
+		)
+		return
+	} else {
+		var apiAccess model.APIAccess
+		e.DB.Where("user_id = ?", user.ID).First(&apiAccess)
+		if len(apiAccess.Token) == 0 {
+			util.GenerateAuthRedirect(
+				ctx,
+				"Failed to fetch user from OIDC Provider",
+				true,
+			)
+			return
+		}
+
+		apiAccess.Token = tokenUUID.String()
+		e.DB.Updates(&apiAccess)
+		util.GenerateAuthRedirect(
+			ctx,
+			tokenUUID.String(),
+			false,
 		)
 		return
 	}

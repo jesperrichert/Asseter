@@ -22,16 +22,16 @@ func (c *RouterConfig) Setup() {
 
 	authMiddleware := middleware.NewAuthMiddleware(c.DB)
 
-	auth := c.App.Group("/auth")
-	{
-		auth.GET("/", c.AuthController.Get)
-		auth.GET("/oidc/callback", c.AuthController.Oidc)
-		auth.GET("/oidc", c.AuthController.OidcConfig)
-		auth.POST("/", c.AuthController.Post)
-	}
-
 	api := c.App.Group("/api")
 	{
+		auth := api.Group("/auth")
+		{
+			auth.GET("/", c.AuthController.Get)
+			auth.GET("/oidc/callback", c.AuthController.Oidc)
+			auth.GET("/oidc", c.AuthController.OidcConfig)
+			auth.POST("/", c.AuthController.Post)
+		}
+
 		api.POST("/storage", authMiddleware.Handle, c.StorageController.Post)
 		api.GET("/storage/:fileName", authMiddleware.Handle, c.StorageController.Get)
 		api.PUT("/storage/:fileName", authMiddleware.Handle, c.StorageController.Put)
