@@ -1,9 +1,11 @@
 package http
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"go.Asseter/internal/dto"
 	"go.Asseter/internal/services"
 	"gorm.io/gorm"
 )
@@ -21,13 +23,19 @@ func NewAuthController(db *gorm.DB, service *services.AuthService) *AuthControll
 }
 
 // POST
-func (e *AuthController) Post(ctx *gin.Context) {
-
+func (e *AuthController) Register(ctx *gin.Context) {
+	var data dto.LocalUserDto
+	json.NewDecoder(ctx.Request.Body).Decode(&data)
+	defer ctx.Request.Body.Close()
+	e.service.Register(ctx, data.Username, data.Password)
 }
 
 // GET
-func (e *AuthController) Get(ctx *gin.Context) {
-
+func (e *AuthController) Login(ctx *gin.Context) {
+	var data dto.LocalUserDto
+	json.NewDecoder(ctx.Request.Body).Decode(&data)
+	defer ctx.Request.Body.Close()
+	e.service.Login(ctx, data.Username, data.Password)
 }
 
 // GET

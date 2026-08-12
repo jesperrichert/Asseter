@@ -13,6 +13,7 @@ import (
 	"go.Asseter/internal/dto"
 	"go.Asseter/internal/model"
 	"go.Asseter/internal/util"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -26,12 +27,75 @@ func NewAuthService(db *gorm.DB) *AuthService {
 	}
 }
 
-func (e *AuthService) Register(username string, password string) {
+func (e *AuthService) Register(ctx *gin.Context, username string, password string) {
+	var user model.User
+	tokenUUID := uuid.New()
+	e.DB.Where("user_name = ?", username).First(&user)
+	if len(user.UserName) == 0 && len(username) != 0 {
+		hash, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 
+		user.IsOidc = false
+		user.UserName = username
+		user.Password = string(hash)
+
+		e.DB.Create(&user)
+		e.DB.Create(&model.APIAccess{
+			User:        &user,
+			Permissions: []string{},
+			Token:       tokenUUID.String(),
+		})
+
+		util.GenerateAuthRedirect(
+			ctx,
+			tokenUUID.String(),
+			false,
+		)
+		return
+	} else {
+		util.GenerateAuthRedirect(
+			ctx,
+			"Username already taken! Choose an other one.",
+			true,
+		)
+		return
+	}
 }
 
-func (e *AuthService) Login(username string, password string) {
+func (e *AuthService) Login(ctx *gin.Context, username string, password string) {
+	var user model.User
+	e.DB.Where("user_name = ?", username).First(&user)
+	if len(user.UserName) != 0 && len(username) != 0 && user.IsOidc == false {
+		err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+		if err != nil {
+			fmt.Println(err)
+			util.GenerateAuthRedirect(
+				ctx,
+				"Invalid password.",
+				true,
+			)
+			return
+		}
 
+		tokenUUID := uuid.New()
+		var apiAccess model.APIAccess
+		e.DB.Where("user_id = ?", user.ID).First(&apiAccess)
+
+		apiAccess.Token = tokenUUID.String()
+		e.DB.Updates(&apiAccess)
+		util.GenerateAuthRedirect(
+			ctx,
+			tokenUUID.String(),
+			false,
+		)
+		return
+	} else {
+		util.GenerateAuthRedirect(
+			ctx,
+			"No User found!",
+			true,
+		)
+		return
+	}
 }
 
 func (e *AuthService) Oidc(ctx *gin.Context, code string) {

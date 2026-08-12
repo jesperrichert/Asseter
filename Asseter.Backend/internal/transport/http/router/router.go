@@ -26,10 +26,10 @@ func (c *RouterConfig) Setup() {
 	{
 		auth := api.Group("/auth")
 		{
-			auth.GET("/", c.AuthController.Get)
+			auth.POST("/login", c.AuthController.Login)
+			auth.POST("/register", c.AuthController.Register)
 			auth.GET("/oidc/callback", c.AuthController.Oidc)
 			auth.GET("/oidc", c.AuthController.OidcConfig)
-			auth.POST("/", c.AuthController.Post)
 		}
 
 		api.POST("/storage", authMiddleware.Handle, c.StorageController.Post)
