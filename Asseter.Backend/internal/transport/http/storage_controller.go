@@ -1,39 +1,54 @@
 package http
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"go.Asseter/internal/services"
+	"go.Asseter/internal/util"
 	"gorm.io/gorm"
 )
 
 type StorageController struct {
-	db      *gorm.DB
-	service *services.StorageService
+	DB      *gorm.DB
+	Service *services.StorageService
 }
 
 func NewStorageController(db *gorm.DB, service *services.StorageService) *StorageController {
 	return &StorageController{
-		db:      db,
-		service: service,
+		DB:      db,
+		Service: service,
 	}
 }
 
 // POST
 func (e *StorageController) Post(ctx *gin.Context) {
-
+	isVaild, _ := util.Permission(*e.DB, util.GetSettionID(ctx), "storage:post")
+	if !isVaild {
+		util.GenerateResponse(ctx, http.StatusUnauthorized, "No Session found.", true, nil)
+		return
+	}
+	e.Service.WriteFile(ctx)
 }
 
 // GET
 func (e *StorageController) Get(ctx *gin.Context) {
-
-}
-
-// PUT
-func (e *StorageController) Put(ctx *gin.Context) {
-
+	isVaild, _ := util.Permission(*e.DB, util.GetSettionID(ctx), "storage:get")
+	if !isVaild {
+		util.GenerateResponse(ctx, http.StatusUnauthorized, "No Session found.", true, nil)
+		return
+	}
+	fileName := ctx.Param("fileName")
+	e.Service.GetFile(ctx, fileName)
 }
 
 // DELETE
 func (e *StorageController) Delete(ctx *gin.Context) {
-
+	isVaild, _ := util.Permission(*e.DB, util.GetSettionID(ctx), "storage:delete")
+	if !isVaild {
+		util.GenerateResponse(ctx, http.StatusUnauthorized, "No Session found.", true, nil)
+		return
+	}
+	fileName := ctx.Param("fileName")
+	e.Service.DeleteFile(ctx, fileName)
 }

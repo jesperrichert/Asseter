@@ -29,21 +29,22 @@ func (middleware *AuthMiddleware) Handle(ctx *gin.Context) {
 			true,
 			nil,
 		)
+		ctx.Abort()
 		return
 	}
 	var access model.APIAccess
 	middleware.DB.First(&access, "token = ?", token)
 
-	if len(access.Token) != 0 {
-		ctx.Next()
+	if len(access.Token) == 0 {
+		util.GenerateResponse(
+			ctx,
+			http.StatusUnauthorized,
+			"Unauthorized",
+			true,
+			nil,
+		)
+		ctx.Abort()
 		return
 	}
-
-	util.GenerateResponse(
-		ctx,
-		http.StatusUnauthorized,
-		"Unauthorized",
-		true,
-		nil,
-	)
+	ctx.Next()
 }

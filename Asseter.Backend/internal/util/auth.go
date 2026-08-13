@@ -19,3 +19,8 @@ func GenerateResponse(ctx *gin.Context, code int, message string, isError bool, 
 func GenerateAuthRedirect(ctx *gin.Context, details string, isError bool) {
 	ctx.Redirect(http.StatusPermanentRedirect, "/auth/callback?success="+strconv.FormatBool(!isError)+"&details="+details+"")
 }
+
+func GetSettionID(ctx *gin.Context) string {
+	session := ctx.Request.Header.Get("Authorization")
+	return session
+}

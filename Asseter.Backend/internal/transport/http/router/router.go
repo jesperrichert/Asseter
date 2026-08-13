@@ -34,7 +34,6 @@ func (c *RouterConfig) Setup() {
 
 		api.POST("/storage", authMiddleware.Handle, c.StorageController.Post)
 		api.GET("/storage/:fileName", authMiddleware.Handle, c.StorageController.Get)
-		api.PUT("/storage/:fileName", authMiddleware.Handle, c.StorageController.Put)
 		api.DELETE("/storage/:fileName", authMiddleware.Handle, c.StorageController.Delete)
 	}
 

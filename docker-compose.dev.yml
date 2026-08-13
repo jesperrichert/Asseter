@@ -1,6 +1,8 @@
 services:
   app:
     image: ghcr.io/jesperrichert/asseter:latest
+    volumes:
+      - "./storage/:/app/storage/"
     ports:
       - "4000:3000"
     depends_on:
