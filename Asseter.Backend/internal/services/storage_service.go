@@ -5,14 +5,18 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"go.Asseter/internal/env"
 	"go.Asseter/internal/util"
 )
 
 type StorageService struct {
+	Config *env.Config
 }
 
-func NewStorageService() *StorageService {
-	return &StorageService{}
+func NewStorageService(config *env.Config) *StorageService {
+	return &StorageService{
+		Config: config,
+	}
 }
 
 func (e *StorageService) WriteFile(ctx *gin.Context) {

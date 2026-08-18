@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"go.Asseter/internal/dto"
+	"go.Asseter/internal/env"
 	"go.Asseter/internal/model"
 	"go.Asseter/internal/util"
 	"golang.org/x/crypto/bcrypt"
@@ -18,12 +19,14 @@ import (
 )
 
 type AuthService struct {
-	DB *gorm.DB
+	Config *env.Config
+	DB     *gorm.DB
 }
 
-func NewAuthService(db *gorm.DB) *AuthService {
+func NewAuthService(db *gorm.DB, config *env.Config) *AuthService {
 	return &AuthService{
-		DB: db,
+		Config: config,
+		DB:     db,
 	}
 }
 

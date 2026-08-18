@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/gin-gonic/gin"
+	"go.Asseter/internal/env"
 	"go.Asseter/internal/services"
 	"go.Asseter/internal/transport/http"
 	"go.Asseter/internal/transport/http/router"
@@ -9,15 +10,16 @@ import (
 )
 
 type Appconfig struct {
-	App *gin.Engine
-	DB  *gorm.DB
+	Config *env.Config
+	App    *gin.Engine
+	DB     *gorm.DB
 }
 
 func Build(config *Appconfig) {
 
 	//Register Services
-	authService := services.NewAuthService(config.DB)
-	storageService := services.NewStorageService()
+	authService := services.NewAuthService(config.DB, config.Config)
+	storageService := services.NewStorageService(config.Config)
 
 	//Register Controller
 	authController := http.NewAuthController(config.DB, authService)

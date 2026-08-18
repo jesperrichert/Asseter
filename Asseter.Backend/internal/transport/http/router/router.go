@@ -2,17 +2,18 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
+	"go.Asseter/internal/env"
 	"go.Asseter/internal/transport/http"
 	"go.Asseter/internal/transport/http/middleware"
 	"gorm.io/gorm"
 )
 
 type RouterConfig struct {
+	Config            *env.Config
 	App               *gin.Engine
 	DB                *gorm.DB
 	AuthController    *http.AuthController
 	StorageController *http.StorageController
-	//Register Controller Here
 }
 
 func (c *RouterConfig) Setup() {
