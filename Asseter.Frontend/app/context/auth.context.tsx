@@ -1,22 +1,44 @@
 import { createContext, useEffect, useState } from "react";
+import Cookies from "js-cookie";
 
-export type AuthToken = string|null
+export type AuthToken = string | null;
+export type UserDto = {
+  username: string;
+  isOidc: string;
+} | null;
 
-export const AuthContext = createContext<AuthToken>(null)
+export type UserSession = {
+  session: AuthToken;
+  user: UserDto;
+};
+
+export const AuthContext = createContext<UserSession | null>(null);
 
 export function Auth({ children }: { children: React.ReactNode }) {
-    const [auth, setAuth] = useState<AuthToken|null>(null)
+  const [auth, setAuth] = useState<AuthToken | null>(null);
+  const [user, setUser] = useState<UserDto | null>(null);
 
-    useEffect(() => {
-        if (window.location.href.split("/").includes("auth")) return
-        try {
-            const cookie = document.cookie.split("session=")[1].split(";")[0]
-            setAuth(cookie)
-        } catch (e) {
-            window.open("/auth", "_self")
-        }
-        // TODO: Check Token... With /api/auth/@me
-    }, [])
+  useEffect(() => {
+    if (window.location.href.split("/").includes("auth")) return;
+    const cookie = Cookies.get("session");
+    if (cookie == undefined) window.open("/auth", "_self");
+    setAuth(cookie as string);
 
-    return <AuthContext value={auth}>{children}</AuthContext>
+    async function me() {
+      const data = await fetch("/api/auth/@me", {
+        headers: {
+          Authorization: cookie ?? "",
+        },
+      });
+      if (data.status != 200) window.open("/auth", "_self");
+      const res = await data.json();
+      const userDto = res.data;
+      setUser(userDto);
+    }
+    me();
+  }, []);
+
+  return (
+    <AuthContext value={{ session: auth, user: user }}>{children}</AuthContext>
+  );
 }

@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"go.Asseter/internal/dto"
+	"go.Asseter/internal/model"
 	"go.Asseter/internal/services"
 	"go.Asseter/internal/util"
 	"gorm.io/gorm"
@@ -21,6 +22,33 @@ func NewAuthController(db *gorm.DB, service *services.AuthService) *AuthControll
 		DB:      db,
 		Service: service,
 	}
+}
+
+// GET
+func (e *AuthController) Me(ctx *gin.Context) {
+	sessionId := util.GetSettionID(ctx)
+	var apiAccess model.APIAccess
+	e.DB.Where("token = ?", sessionId).Preload("User").First(&apiAccess)
+	if len(apiAccess.Token) == 0 {
+		util.GenerateResponse(
+			ctx,
+			http.StatusUnauthorized,
+			"Unauthorized",
+			true,
+			nil,
+		)
+		return
+	}
+	util.GenerateResponse(
+		ctx,
+		http.StatusOK,
+		"USER",
+		true,
+		dto.UserDto{
+			UserName: apiAccess.User.UserName,
+			IsOidc:   apiAccess.User.IsOidc,
+		},
+	)
 }
 
 // POST

@@ -1,4 +1,4 @@
-import App from "~/root";
+import { App } from "~/components/custom/home/App";
 import type { Route } from "./+types/home";
 
 export function meta({}: Route.MetaArgs) {
