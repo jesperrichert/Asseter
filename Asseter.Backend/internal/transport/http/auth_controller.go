@@ -88,3 +88,10 @@ func (e *AuthController) OidcConfig(ctx *gin.Context) {
 		"authenticationUrl": e.Service.GenerateOidcAuthorizationUrl(),
 	})
 }
+
+// GET
+func (e *AuthController) Config(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, gin.H{
+		"showRegister": e.Service.Config.AllowRegister,
+	})
+}

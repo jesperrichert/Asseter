@@ -32,6 +32,7 @@ func (c *RouterConfig) Setup() {
 			auth.POST("/register", c.AuthController.Register)
 			auth.GET("/oidc/callback", c.AuthController.Oidc)
 			auth.GET("/oidc", c.AuthController.OidcConfig)
+			auth.GET("/config", c.AuthController.Config)
 		}
 
 		api.POST("/storage", authMiddleware.Handle, c.StorageController.Post)

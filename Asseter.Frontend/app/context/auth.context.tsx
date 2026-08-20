@@ -21,7 +21,6 @@ export function Auth({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (window.location.href.split("/").includes("auth")) return;
     const cookie = Cookies.get("session");
-    if (cookie == undefined) window.open("/auth", "_self");
     setAuth(cookie as string);
 
     async function me() {

@@ -12,8 +12,8 @@
 
 html,
 body {
-  @apply bg-white dark:bg-gray-950;
-
+  @apply bg-[#070709];
+  @apply text-white;
   @media (prefers-color-scheme: dark) {
     color-scheme: dark;
   }
@@ -63,7 +63,7 @@ body {
 }
 
 :root {
-  --background: oklch(1 0 0);
+  --background: rgb(255, 255, 255);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
